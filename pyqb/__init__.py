@@ -118,7 +118,7 @@ class Client():
         res = self.session.post(url, headers=headers, data=request.tostring(), proxies=self.proxy)
         return res
 
-    def doquery(self, query=None, qid=None, qname=None, database=None,
+    def doquery_raw(self, query=None, qid=None, qname=None, database=None,
                 fields=None, fmt=False, rids=False, sort_fields=None, options=False, fids=False):
         req = {}
         if query is not None:
@@ -149,11 +149,23 @@ class Client():
 
         if options:
             req["options"] = options
-            
+
         if fids:
             req["useFids"] = 1
-            
+
         res = self.__request('DoQuery', database, req)
+
+        return res
+
+    def doquery(self, query=None, qid=None, qname=None, database=None,
+                fields=None, fmt=False, rids=False, sort_fields=None, options=False, fids=False):
+
+        res = self.doquery_raw(
+            query=None, qid=None, qname=None, database=None,
+            fields=None, fmt=False, rids=False,
+            sort_fields=None, options=False, fids=False
+        )
+
         return xmltodict.parse(et.tostring(res))['qdbapi']
 
     def editrecord(self, rid=None, database=None, fields=None, update_id=None, ms_in_utc=False):
