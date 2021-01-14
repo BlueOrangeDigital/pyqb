@@ -24,8 +24,8 @@ class QBRequest():
         self.request = request
         if ticket:
             self.request["ticket"] = ticket
-        elif user_token:
-            self.request["usertoken"] = user_token
+        if user_token:
+            self.request["apptoken"] = user_token
         self.request["encoding"] = encoding
         self.body = ""
 
@@ -93,13 +93,15 @@ class Client():
             "QUICKBASE-ACTION": "API_" + action
         }
         url = self.url + "/db/" + db
+
         if self.ticket:
-            request = QBRequest(request, ticket=self.ticket)
+            request = QBRequest(request, ticket=self.ticket, user_token=self.user_token)
         elif self.user_token:
             request = QBRequest(request, user_token=self.user_token)
         else:
             request = QBRequest(request)
         res = self.__make_req(url, headers, request)
+
         parsed = et.XML(res.text)
 
         # check errcode
